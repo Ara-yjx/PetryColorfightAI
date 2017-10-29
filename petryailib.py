@@ -5,6 +5,8 @@ NAME = "Petry100"
 
 
 battleField = []
+hqPosition = [0,0]
+mySoldiersNum = 0
 
 G = colorfight.Game()
 G.JoinGame(NAME)
@@ -12,15 +14,51 @@ G.JoinGame(NAME)
 
 def initHq():
 	print("OvO  INITIALIZING HQ")
+
+	battleField = []
+	hqPosition = [0,0]
+	mySoldiersNum = 0
+
+	hq_pos_sum_x = 0.0	#local var for calcaulating the HQ coordinate
+	hq_pos_sum_y = 0.0
+
+
 	for j in range(G.height):
 		for i in range(G.width):
-			battleField.append(Soldier(i, j))
+			s=Soldier(i, j)
+			battleField.append(s)
+			if s.isMine(): 
+				hq_pos_sum_x += i
+				hq_pos_sum_y += j
+				mySoldiersNum += 1
+
+
+	hq_pos_sum_x /= mySoldiersNum
+	hq_pos_sum_y /= mySoldiersNum
+	hqPosition = [hq_pos_sum_x,hq_pos_sum_y]
+
+
+	print("MY_SOL = "+str(mySoldiersNum))
+	print("HQ_POS = "+str(hqPosition))
+
+	for si in range(G.width*G.height):
+		battleField[si].print()
+
 	print("=w=  INITIALIZED")
 			
 
 def call(coordinate): 
 # access to soldier !!! CANNOT HANDLE {None}
 	return battleField[coordinate[0] + coordinate[1]*G.width]
+
+def allSoldiers():
+	result = []
+	for j in range(G.height):
+		for i in range(G.width):
+			result.append(call([i,j]))
+	return result
+
+
 
 class Soldier:
 	
@@ -63,9 +101,15 @@ class Soldier:
 		elif position == "down": return self.neighbour().call(n[2])
 		elif position == "left": return self.neighbour().call(n[3])
 
-#	def atFrontline(self):
-#		for n_cor in neighbour():
-#			if call(n_cor)
+	def atFrontline(self):
+		if self.isMine():
+			for n_cor in self.neighbours():
+				if n_cor != None:
+					if not call(n_cor).isMine(): 
+						#if any of its valid neighbour is not mine
+						return True 
+		return False
+
 
 	def neighboursTime(self):
 		if self._neighboursTime == None:
@@ -93,7 +137,8 @@ class Soldier:
 					min_cor = self.neighbours()[i]
 		return [min_time, min_cor]
 
-
+	def distanceToHq(self):
+		return abs(self.x-hqPosition[0])+abs(self.y-hqPosition[1])
 
 	def print(self):
 		print("[ " + str(self.x) + ", " + str(self.y) + " ]")
@@ -103,4 +148,4 @@ class Soldier:
 			print("owner: " + str(self.owner) + "  --OTHER'S")
 
 
-
+#Soldier OOB(0,0)
