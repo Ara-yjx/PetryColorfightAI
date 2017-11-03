@@ -71,9 +71,8 @@ class PetryAI:
 
 
 		def __init__(self, set_x, set_y):
-			self.x = set_x
-			self.y = set_y
-			c = G.GetCell(self.x, self.y)
+			self.cor=(set_x,set_y)
+			c = G.GetCell(self.cor)
 			self.owner = c.owner
 
 			self._neighbours = None #so that neighbour will only run once
@@ -86,10 +85,6 @@ class PetryAI:
 			#self.occupyTime = c.occupyTime # time stamps. not useful
 			#self.attackTime = c.attackTime # time stamps. not useful
 			#self.neighboursTime()
-
-
-		def cor(self):
-			return [self.x, self.y]
 
 		def isMine(self):
 			return self.owner == G.uid

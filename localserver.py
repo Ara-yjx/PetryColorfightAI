@@ -211,10 +211,28 @@ if __name__ == '__main__':
 							g.PlayerAttackCell(player3,i.x+d[0], i.y+d[1])
 
 
+
 		for i in g.FIELD:
 			if i.owner == player4:
 				d = random.choice([(0,1), (0,-1), (1, 0), (-1,0)])
-				if i.x+d[0]>=0 and i.x+d[0]<30 and i.y+d[1]>=0 and i.y+d[1]<30:
+				if i.x+d[0]>=0 and i.x+d[0]<30 and i.y
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				+d[1]>=0 and i.y+d[1]<30:
 				
 					cc = g.GetCell(i.x+d[0], i.y+d[1])
 					# If that cell is valid(current cell + direction could be
@@ -227,7 +245,7 @@ if __name__ == '__main__':
 		ntp = g.getNextTimePass(auto = False)
 		print("NTP="+str(ntp))
 		g.TimePass(ntp)
-		g.Print()
+		#g.Print()
 
 		print(str(g.cellNum(player1))+" / "+str(g.cellNum(player2))+" / "+str(g.cellNum(player3))+" / "+str(g.cellNum(player4)))
 
