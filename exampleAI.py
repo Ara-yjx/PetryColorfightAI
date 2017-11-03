@@ -22,20 +22,11 @@ if __name__ == '__main__':
                     c = g.GetCell(x,y)
                     # If the cell I got is mine
                     if c.owner == g.uid:
-                        # Pick a random direction based on current cell 
-                        d = random.choice([(0,1), (0,-1), (1, 0), (-1,0)])
-                        # Get that adjacent cell
-                        cc = g.GetCell(x+d[0], y+d[1])
-                        # If that cell is valid(current cell + direction could be
-                        # out of range) and that cell is not mine
-                        if cc != None:
-                            if cc.owner != g.uid:
-                                # Attack the cell and print the result
-                                # if (True, None, None) is printed, it means attack
-                                # is successful, otherwise it will print the error
-                                # code and error message
-                                print(g.AttackCell(x+d[0], y+d[1]))
-                                # Refresh the game, get updated game data
-                                g.Refresh()
+                       #print(g.AttackCell(x,y))
+                       print(g.GetCell(x,y+1).takeTime)
+
+                       # Refresh the game, get updated game data
+        g.Refresh()
+
     else:
-        print "Failed to join the game!"
+        print ("Failed to join the game!")

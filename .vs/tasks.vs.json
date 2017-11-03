@@ -1,0 +1,10 @@
+{
+  "version": "0.2.1",
+  "tasks": [
+    {
+      "taskName": "任务-PetryAI_1_0_0",
+      "appliesTo": "PetryAI_1_0_0.py",
+      "type": "launch"
+    }
+  ]
+}

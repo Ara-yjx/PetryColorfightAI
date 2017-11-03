@@ -1,4 +1,5 @@
 # ColorFight!
+# AI by Petry!
 
 ColorFight is a game where you try to occupy as many cells as possible on the map.
 

@@ -1,7 +1,7 @@
 # You need to import colorfight for all the APIs
 import colorfight
 import petryailib as petry
-
+# import os
 if __name__ == '__main__':
 
 	# You need to join the game using JoinGame(). 'MyAI' is the name of your
@@ -10,30 +10,58 @@ if __name__ == '__main__':
 	# stop your AI and continue from the last time you quit. 
 	# If there's a token and the token is valid, JoinGame() will continue. If
 	# not, you will join as a new player.
-	petry.initHq()
+	g=colorfight.Game()
+	g.JoinGame("petry")
 
-	petry.battleField[0].print()
-	#petry.call([0,0]).print()
-	
-	p = petry.call([0,2]).neighbours()
-	print(p);
+
+	P = petry.PetryAI("Petry110")
+
+	#petry.battleField[0].print()
+
 
 	print("/")
-
-	
 
 
 	# Put you logic in a while True loop so it will run forever until you 
 	# manually stop the game
 	while True:
 		# Use a nested for loop to iterate through the cells on the map
-		print(petry.hqPosition)
-		for c in petry.allSoldiers():
+		print("HQ:")
+		print(P.hqPosition)
+		
+
+
+		for i in P.allSoldiers():
+			if i.isMine():
+				i.print()
+
+		"""
+		#get the greastest potential
+		max_p = -1
+		max_p_sol = [0,0]
+
+		for c in P.allSoldiers():
 			# If the cell I got is mine
 
-			if c.atFrontline(): 
+			if c.outFrontline():
+				print("FRONTLINE: ")
 				c.print()
-				print(c.distanceToHq())
+
+				if not c.isTaking: 
+					#if an outFrontline not being attacked
+					if c.potential()>max_p:
+						max_p_sol = c.cor()
+						max_p = c.potential()
+
+		# attack the one with max potential
+		print("ATTACKING:  "+str(max_p_sol))
+
+		if not P.call(max_p_sol).isMine():
+
+			attackResult = P.G.AttackCell(max_p_sol[0],max_p_sol[1])
+			print(attackResult)
+		else:
+			print("It's mine")
 				# Get that adjacent cell
 #                    cc = g.GetCell(x+d[0], y+d[1])
 				# If that cell is valid(current cell + direction could be
@@ -46,4 +74,10 @@ if __name__ == '__main__':
 						# code and error message
 #                            print(g.AttackCell(x+d[0], y+d[1]))
 						# Refresh the game, get updated game data
-		petry.initHq()
+
+
+		"""
+
+		input("PAUSED")
+		
+		P.refreshHq()
