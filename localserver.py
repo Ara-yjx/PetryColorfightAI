@@ -4,8 +4,8 @@ import random
 class Game:
 
 	#GLOBAL SETTINGS
-	WIDTH = 30
-	HEIGHT = 30
+	width = 30
+	height = 30
 
 
 
@@ -16,17 +16,17 @@ class Game:
 		self.NOW = 0.0
 		#self.view = ""
 
-		for j in range(self.HEIGHT):
-			for i in range(self.WIDTH):
+		for j in range(self.height):
+			for i in range(self.width):
 				self.FIELD.append(Cell(i, j, "normal") )
 	
 	def JoinGame(self,name):
 		self.PLAYERS.append(Player(name, self.playerNum))
 
 		#allocate a birth point
-		bornPlace = int(random.random()*self.WIDTH*self.HEIGHT)
+		bornPlace = int(random.random()*self.width*self.height)
 		while self.FIELD[bornPlace].owner!=None:
-			bornPlace = int(random()*self.WIDTH*self.HEIGHT)
+			bornPlace = int(random()*self.width*self.height)
 		c = self.FIELD[bornPlace]
 		c.owner = self.playerNum
 		c.occupyTime = self.NOW
@@ -36,7 +36,7 @@ class Game:
 
 
 	def GetCell(self,x,y):
-		return self.FIELD[x+y*self.WIDTH]
+		return self.FIELD[x+y*self.width]
 		
 	def PlayerAttackCell(self,attackerId,x,y):
 		p = self.PLAYERS[attackerId]
@@ -47,7 +47,7 @@ class Game:
 		#check if in cd
 		if p.cd > 0: return 3
 		#check if out of boarder
-		if x>=self.WIDTH or y>=self.HEIGHT: return 1
+		if x>=self.width or y>=self.height: return 1
 
 		c = self.GetCell(x,y)
 
@@ -77,8 +77,8 @@ class Game:
 
 	def Print(self):
 		print("NOW = "+str(self.NOW))
-		for j in range(self.HEIGHT):
-			for i in range(self.WIDTH):
+		for j in range(self.height):
+			for i in range(self.width):
 				ownerId = self.GetCell(i,j).owner
 				if ownerId==None:
 					print(".", end=" ")
@@ -101,6 +101,8 @@ class Game:
 					i.owner = i.attacker
 					i.attacker = None
 					i.isTaking = False
+					i.NOW = self.NOW
+					i.refreshTakeTime()
 	
 	def getNextTimePass(self):
 
@@ -141,13 +143,15 @@ class Cell:
 		self.occupyTime = None
 		self.attackTime = None
 		self.finishTime = None
+		self.NOW = 0
+		self.takeTime = 2
+		self.refreshTakeTime()
 
-
-	def takeTime(self, now):
+	def refreshTakeTime(self):
 		if self.isTaking: return None
 		if self.occupyTime == None: return 2;
-		timeDiff = now-self.occupyTime
-		return 20*(2**(-timeDiff//20))+2
+		timeDiff = self.NOW-self.occupyTime
+		self.takeTime = 20*(2**(-timeDiff//20))+2
 
 
 class Player:

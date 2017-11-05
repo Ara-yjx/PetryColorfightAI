@@ -105,12 +105,14 @@ The module provided some API for the game. You are welcome to add your own API, 
 
 # Petry's Accelerated Testing Server (ATS)
 # in class localserver.Game
-## Functions that has (generally) the same function(...) as the official API
+## Functions & variables that has (generally) the same function(...) as the official API
 * JoinGame(name)
 * GetCell(x, y)
 * PlayerAttackCell(attackerId,x,y) //equivalent to AttackCell()
 * cellNum(id)
 * Refresh()
+* width
+* height
 
 ## Data Variables
 * FIELD: list of all cells

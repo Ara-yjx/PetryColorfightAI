@@ -1,18 +1,45 @@
 import colorfight
 import localserver
+import operator
 
 class PetryAI:
 	#global setting
 
-	def __init__ (self, name, eval_rules, mode="test"): 
+	def __init__ (self, gameInstance, name, eval_rules, mode="test"): 
 		self.mode = mode # decides which API shall use
 		self.eval_rules = eval_rules
+		self.G = gameInstance
+		self.myId = self.G.JoinGame(name)
 
-		if self.mode == "test":
-			self.G = localserver.JoinGame(name)
-		else:
-			self.G=colorfight.Game()
-			self.G.JoinGame(name)
+		self.Soldiers = []
+
+		for j in range(self.G.height):
+			for i in range(self.G.width):
+				self.Soldiers.append(self.Soldier(self.G.GetCell(i, j)))
+		
+
+		for s in self.Soldiers:
+			s.isMine = (s.owner == self.myId) #initialize Soldier.isMine
+			self.initNeighboursCor(s) #Remain None if out of boarder
+			self.initActualTT(s)
+
+	def initNeighboursCor(self, soldier):
+		if soldier.cor[1]<self.G.height-1: 
+			soldier.neighboursCor[0] = tuple(map(operator.add, soldier.cor, (0,1)))
+		if soldier.cor[0]<self.G.width-1: 
+			soldier.neighboursCor[1] = tuple(map(operator.add, soldier.cor, (1,0)))
+		if soldier.cor[1]>0: 
+			soldier.neighboursCor[2] = tuple(map(operator.add, soldier.cor, (0,-1)))
+		if soldier.cor[0]>0: 
+			soldier.neighboursCor[3] = tuple(map(operator.add, soldier.cor, (-1,0)))
+
+	def initActualTT(self, soldier):
+		neiMine = 0
+		for i in soldier.neighboursCor:
+			if i!=None:
+				if self.call(i).isMine:
+					neiMine+=1
+		if neiMine>0: soldier.takeTime -= (neiMine-1)*0.5
 
 		"""
 		def refreshHq(self):
@@ -58,7 +85,7 @@ class PetryAI:
 
 	def call(self,coordinate): 
 	# access to soldier !!! CANNOT HANDLE {None}
-		return self.battleField[coordinate[0] + coordinate[1]*G.width]
+		return self.Soldiers[coordinate[0] + coordinate[1]*self.G.width]
 
 
 	def allSoldiers(self):
@@ -74,11 +101,10 @@ class PetryAI:
 	
 		def __init__(self, cell):
 			self.cor=(cell.x, cell.y)
-		
+			self.isMine = False #updated outside
 			self.owner = cell.owner
-			self.isMine = (self.owner == self.G.uid)
 			self.isTaking = cell.isTaking
-			self.takeTime = cell.takeTime # seconds it would take if you attack this cell
+			self.takeTime = cell.takeTime #updated outside
 			self.attacker = cell.attacker
 			self.finishTime = cell.finishTime
 			
@@ -86,22 +112,16 @@ class PetryAI:
 			#self.attackTime = c.attackTime # time stamps. not useful
 			#self.neighboursTime()
 
-			self.neighboursCor = [None, None, None, None] #None if out of boarder
-			self.initNeighboursCor()
+			self.neighboursCor = [None, None, None, None] #updated outside
 			"""
 			self.NeighboursTime = [None, None, None, None]
 			self.initNeighboursTime()
 			"""
-			self.initActualTT()
+	
 
 
 
-		def initNeighboursCor(self):
-			
-			if self.y<G.height-1: self.neighboursCor[0] = (self.x, self.y+1)
-			if self.x<G.width-1: self.neighboursCor[1] = (self.x+1, self.y)
-			if self.y>0: self.neighboursCor[2] = (self.x, self.y-1)
-			if self.x>0: self.neighboursCor[3] = (self.x-1, self.y)
+	
 		
 			"""
 		def neighbourTo(self, position):
@@ -111,7 +131,9 @@ class PetryAI:
 			elif position == "left": return self.neighbour().call(n[3])
 			"""
 
-		def initActualTT(self)
+		
+
+
 
 		def atFrontline(self):
 			if self.isMine():
@@ -176,7 +198,7 @@ class PetryAI:
 			return abs(self.x-hqPosition[0])+abs(self.y-hqPosition[1])
 
 		def refreshSoldier(self):
-			return
+			return 0
 
 		def print(self):
 			print("[ " + str(self.x) + ", " + str(self.y) + " ]")

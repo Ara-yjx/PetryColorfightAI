@@ -1,4 +1,4 @@
-import petrysimpleai as petry
+import petryailib as petry
 import localserver as server
 
 #GLOBAL SETTINGS
@@ -8,9 +8,9 @@ AI_NUM = 8
 g = server.Game()
 
 
-AI.append(petry.PetrySimpleAI(str(i)+"P"))
+AI.append(petry.PetryAI(g, "0P", None))
 
-
+"""
 while True:
 	for anAI in AI:
 		if g.PLAYERS[anAI.g.id] <=0 : #if this AI is ready to move
@@ -28,3 +28,4 @@ while True:
 					") FAIL: ERROR_CODE=" + str(atk)
 
 	g.getNextTimePass
+"""
