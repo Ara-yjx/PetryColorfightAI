@@ -97,17 +97,14 @@ The module provided some API for the game. You are welcome to add your own API, 
 ### Error Code from AttackCell()
 
 * 0: Success.
-
 * 1: The cell you attack is invalid. It could be that your input is out of the map, or the cell you attack is not adjacent to your occupied cells.
-
 * 2: The cell you attack is being taken by another player.
-
 * 3: You are in CD time. You can't attack any cell now.
-
 * 4: The game already ends
 
-# Petry's Accelerated Testing Server (ATS)
 
+# Petry's Accelerated Testing Server (ATS)
+# in class localserver.Game
 ## Functions that has (generally) the same function(...) as the official API
 * JoinGame(name)
 * GetCell(x, y)
@@ -116,7 +113,7 @@ The module provided some API for the game. You are welcome to add your own API, 
 
 ## Data Variables
 * FIELD: list of all cells
-* PLAYERS: list of all players
+* PLAYERS: list of localserver.Player 's
 * playerNum: number of players
 * NOW: current time, in seconds
 
@@ -124,3 +121,15 @@ The module provided some API for the game. You are welcome to add your own API, 
 * Print()
 * TimePass(time)  //pass {time} seconds
 * getNextTimePass(auto = True)  //get the min of players' cd
+
+#in class localserver.Player
+## Variables
+* name
+* cd
+* id
+
+## Functions
+* cdDown(time)
+
+# Testing controller
+# in class localtester

@@ -187,7 +187,7 @@ class PetrySimpleAI:
 		self.coe_rules=coe_rules
 		self.g=colorfight.Game()
 		self.g.JoinGame(name)
-		return g.uid
+		
 
 	def eval(self):
 

@@ -2,7 +2,7 @@ import petryailib as petry
 import localserver as server
 
 #GLOBAL SETTINGS
-AI = []
+AI = [] #AIs
 AI_NUM = 8
 
 g = server.Game()
@@ -14,5 +14,5 @@ for i in range(PLAYER_NUM):
 
 while True:
 	for anAI in AI:
-		if g <=0 :#if this AI is ready to move
-			
+		if g.PLAYERS[anAI.g.] <=0 :#if this AI is ready to move
+			anAI
