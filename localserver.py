@@ -13,8 +13,8 @@ class Game:
 		self.FIELD = []
 		self.PLAYERS = []
 		self.playerNum = 0
-		self.view = ""
 		self.NOW = 0.0
+		#self.view = ""
 
 		for j in range(self.HEIGHT):
 			for i in range(self.WIDTH):
@@ -76,6 +76,7 @@ class Game:
 
 
 	def Print(self):
+		print("NOW = "+str(self.NOW))
 		for j in range(self.HEIGHT):
 			for i in range(self.WIDTH):
 				ownerId = self.GetCell(i,j).owner
@@ -215,24 +216,7 @@ if __name__ == '__main__':
 		for i in g.FIELD:
 			if i.owner == player4:
 				d = random.choice([(0,1), (0,-1), (1, 0), (-1,0)])
-				if i.x+d[0]>=0 and i.x+d[0]<30 and i.y
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				+d[1]>=0 and i.y+d[1]<30:
+				if i.x+d[0]>=0 and i.x+d[0]<30 and i.y+d[1]>=0 and i.y+d[1]<30:
 				
 					cc = g.GetCell(i.x+d[0], i.y+d[1])
 					# If that cell is valid(current cell + direction could be

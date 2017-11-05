@@ -27,7 +27,7 @@ if __name__ == '__main__':
 	while True:
 		# Use a nested for loop to iterate through the cells on the map
 		print("HQ:")
-		print(P.hqPosition)
+		#print(P.hqPosition)
 		
 
 

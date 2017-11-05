@@ -1,9 +1,10 @@
-# ColorFight!
-# AI by Petry!
+# ColorFight! AI and Accelerated Testing Server by Petry!
+
+## ColorFight 
 
 ColorFight is a game where you try to occupy as many cells as possible on the map.
 
-## Rules
+### Rules
 
 * When you join the game, you will be given a random cell as a start.
 
@@ -17,7 +18,7 @@ ColorFight is a game where you try to occupy as many cells as possible on the ma
 
 * Golden cells worth 5 times as normal cells.
 
-## How To Start
+### How To Start
 
 * First clone the git repository. `git clone https://github.com/gaogaotiantian/ColorFightAI.git`
 
@@ -29,13 +30,13 @@ ColorFight is a game where you try to occupy as many cells as possible on the ma
 
 * You can watch the result here [https://colorfight.herokuapp.com/](https://colorfight.herokuapp.com)
 
-## API
+### API
 
 The module provided some API for the game. You are welcome to add your own API, even directly talk to the server with HTTP requests if you want.
 
 `Game` is the main class for the API. You should instantiate an object for it like `g = Game()`.
 
-### After that, you can do the following actions:
+#### After that, you can do the following actions:
 
 * `JoinGame(name)` will let you join the game with a name. ex. `g.JoinGame('MyAI')`. Notice the API is already optimized so when you try to join the game with the same name on the same computer(with the generated token file), it will not generate a user. You can continue to play the game as the user before. `name` has to be a `str`.
 
@@ -45,7 +46,7 @@ The module provided some API for the game. You are welcome to add your own API, 
 
 * `AttackCell(x,y)`is the only action you need to play the game. ex. `g.AttackCell(2,2)`. It will try to attack the cell you specified. The return value will be a tuple with 3 items. Returning `(True, None, None)` means the action is successful. Otherwise it will return a tuple `(False, err_code, err_msg)` where `err_code` will contain the error code from the server and `err_msg` will contain the reason it failed.
 
-### You also have the following data in `Game`:
+#### You also have the following data in `Game`:
 
 * `uid` contains your user id. That's the unique identification for you.
 
@@ -61,7 +62,7 @@ The module provided some API for the game. You are welcome to add your own API, 
 
 * `cellNum` is your cell number
 
-## Cell Data
+### Cell Data
 
 * `owner`: who owns this cell now. It's a user id.
 
@@ -83,7 +84,7 @@ The module provided some API for the game. You are welcome to add your own API, 
 
 * `cellType`: `'gold'` if it's golden cell and `'normal'` if it's a normal cell.`
 
-## User Data
+### User Data
 
 * `id`: unique user identification.
 
@@ -93,7 +94,7 @@ The module provided some API for the game. You are welcome to add your own API, 
 
 * `cellNum`: how many cells does this user occupy.
 
-## Error Code from AttackCell()
+### Error Code from AttackCell()
 
 * 0: Success.
 
@@ -104,3 +105,22 @@ The module provided some API for the game. You are welcome to add your own API, 
 * 3: You are in CD time. You can't attack any cell now.
 
 * 4: The game already ends
+
+# Petry's Accelerated Testing Server (ATS)
+
+## Functions that has (generally) the same function(...) as the official API
+* JoinGame(name)
+* GetCell(x, y)
+* PlayerAttackCell(attackerId,x,y) //equivalent to AttackCell()
+* cellNum(id)  
+
+## Data Variables
+* FIELD: list of all cells
+* PLAYERS: list of all players
+* playerNum: number of players
+* NOW: current time, in seconds
+
+## Functions to operate the server
+* Print()
+* TimePass(time)  //pass {time} seconds
+* getNextTimePass(auto = True)  //get the min of players' cd

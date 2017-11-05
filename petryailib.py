@@ -6,25 +6,24 @@ class PetryAI:
 	def __init__(self, name):
 		self.NAME = name
 
-		G = colorfight.Game()
-		G.JoinGame(self.NAME)
-#		refreshHq()
+		self.G = colorfight.Game()
+		self.G.JoinGame(self.NAME)
+		self.refreshHq()
 
 	def refreshHq(self):
 		print()
 		print("OvO  Refreshing HQ")
 		self.G.Refresh()
 
-
 		self.mySoldiersNum = 0
 		self.battleField = []
 
 		hq_pos_sum_x = 0.0	#temp var for calcaulating the HQ coordinate
 		hq_pos_sum_y = 0.0
-		for j in range(G.height):
-			for i in range(G.width):
-				s=Soldier(i, j)
-				battleField.append(s)
+		for j in range(self.G.height):
+			for i in range(self.G.width):
+				s=self.Soldier(i, j, self.G)
+				self.battleField.append(s)
 				if s.isMine(): 
 					hq_pos_sum_x += i
 					hq_pos_sum_y += j
@@ -36,7 +35,7 @@ class PetryAI:
 		print("MY_SOL = "+str(mySoldiersNum))
 		print("HQ_POS = "+str(hqPosition))
 
-
+		#update TAKETIME
 		for s in self.allSoldiers():
 			neighbourIsMine = 0
 			for i in s.neighbours():
@@ -70,9 +69,9 @@ class PetryAI:
 	
 
 
-		def __init__(self, set_x, set_y):
-			self.cor=(set_x,set_y)
-			c = G.GetCell(self.cor)
+		def __init__(self, set_x, set_y, G):
+			self.cor=[set_x,set_y]
+			c = G.GetCell(self.x(), self.y())
 			self.owner = c.owner
 
 			self._neighbours = None #so that neighbour will only run once
@@ -86,8 +85,11 @@ class PetryAI:
 			#self.attackTime = c.attackTime # time stamps. not useful
 			#self.neighboursTime()
 
+		def x(self): return self.cor[0]
+		def y(self): return self.cor[1]
+
 		def isMine(self):
-			return self.owner == G.uid
+			return self.owner == self.G.uid
 
 
 		def neighbours(self):
@@ -177,3 +179,28 @@ class PetryAI:
 
 
 	#Soldier OOB(0,0)
+
+
+class PetrySimpleAI:
+
+	def __init__ (self, name, coe_rules):
+		self.coe_rules=coe_rules
+		self.g=colorfight.Game()
+		self.g.JoinGame(name)
+		return g.uid
+
+	def eval(self):
+
+
+	def actualTT(self, cell_cor, uid):
+		tt = self.g.GetCell(cell_cor[0],cell_cor[1])
+		
+
+
+	def getAttributions(self, cell_cor):
+		attributions = {\
+			'TT' = self.takeTime\
+			'isMine': False,\
+
+
+			}
