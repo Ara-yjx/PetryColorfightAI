@@ -109,7 +109,8 @@ The module provided some API for the game. You are welcome to add your own API, 
 * JoinGame(name)
 * GetCell(x, y)
 * PlayerAttackCell(attackerId,x,y) //equivalent to AttackCell()
-* cellNum(id)  
+* cellNum(id)
+* Refresh()
 
 ## Data Variables
 * FIELD: list of all cells

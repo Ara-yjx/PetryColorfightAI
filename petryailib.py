@@ -1,55 +1,60 @@
 import colorfight
+import localserver
 
 class PetryAI:
 	#global setting
 
-	def __init__(self, name):
-		self.NAME = name
+	def __init__ (self, name, eval_rules, mode="test"): 
+		self.mode = mode # decides which API shall use
+		self.eval_rules = eval_rules
 
-		self.G = colorfight.Game()
-		self.G.JoinGame(self.NAME)
-		self.refreshHq()
+		if self.mode == "test":
+			self.G = localserver.JoinGame(name)
+		else:
+			self.G=colorfight.Game()
+			self.G.JoinGame(name)
 
-	def refreshHq(self):
-		print()
-		print("OvO  Refreshing HQ")
-		self.G.Refresh()
+		"""
+		def refreshHq(self):
+			print()
+			print("OvO  Refreshing HQ")
+			self.G.Refresh()
 
-		self.mySoldiersNum = 0
-		self.battleField = []
+			self.mySoldiersNum = 0
+			self.battleField = []
 
-		hq_pos_sum_x = 0.0	#temp var for calcaulating the HQ coordinate
-		hq_pos_sum_y = 0.0
-		for j in range(self.G.height):
-			for i in range(self.G.width):
-				s=self.Soldier(i, j, self.G)
-				self.battleField.append(s)
-				if s.isMine(): 
-					hq_pos_sum_x += i
-					hq_pos_sum_y += j
-					mySoldiersNum += 1
-		hq_pos_sum_x /= mySoldiersNum
-		hq_pos_sum_y /= mySoldiersNum
-		self.hqPosition = [hq_pos_sum_x,hq_pos_sum_y]
+			hq_pos_sum_x = 0.0	#temp var for calcaulating the HQ coordinate
+			hq_pos_sum_y = 0.0
+			for j in range(self.G.height):
+				for i in range(self.G.width):
+					s=self.Soldier(i, j, self.G)
+					self.battleField.append(s)
+					if s.isMine(): 
+						hq_pos_sum_x += i
+						hq_pos_sum_y += j
+						mySoldiersNum += 1
+			hq_pos_sum_x /= mySoldiersNum
+			hq_pos_sum_y /= mySoldiersNum
+			self.hqPosition = [hq_pos_sum_x,hq_pos_sum_y]
 
-		print("MY_SOL = "+str(mySoldiersNum))
-		print("HQ_POS = "+str(hqPosition))
+			print("MY_SOL = "+str(mySoldiersNum))
+			print("HQ_POS = "+str(hqPosition))
 
-		#update TAKETIME
-		for s in self.allSoldiers():
-			neighbourIsMine = 0
-			for i in s.neighbours():
-				if i!=None:
-					if call(i).isMine():
-						neighbourIsMine += 1
-			if neighbourIsMine>1 :
-				s.takeTime -= neighbourIsMine*0.5
+			#update TAKETIME
+			for s in self.allSoldiers():
+				neighbourIsMine = 0
+				for i in s.neighbours():
+					if i!=None:
+						if call(i).isMine():
+							neighbourIsMine += 1
+				if neighbourIsMine>1 :
+					s.takeTime -= neighbourIsMine*0.5
 
 
 
-		print("=w=  INITIALIZED")
-		print()
-
+			print("=w=  INITIALIZED")
+			print()
+		"""
 
 	def call(self,coordinate): 
 	# access to soldier !!! CANNOT HANDLE {None}
@@ -67,46 +72,46 @@ class PetryAI:
 
 	class Soldier:
 	
-
-
-		def __init__(self, set_x, set_y, G):
-			self.cor=[set_x,set_y]
-			c = G.GetCell(self.x(), self.y())
-			self.owner = c.owner
-
-			self._neighbours = None #so that neighbour will only run once
-			self._neighboursTime = None
-
-			self.isTaking = c.isTaking
-			self.takeTime = c.takeTime # seconds it would take if you attack this cell
-			self.attacker = c.attacker
-			self.finishTime = c.finishTime
+		def __init__(self, cell):
+			self.cor=(cell.x, cell.y)
+		
+			self.owner = cell.owner
+			self.isMine = (self.owner == self.G.uid)
+			self.isTaking = cell.isTaking
+			self.takeTime = cell.takeTime # seconds it would take if you attack this cell
+			self.attacker = cell.attacker
+			self.finishTime = cell.finishTime
+			
 			#self.occupyTime = c.occupyTime # time stamps. not useful
 			#self.attackTime = c.attackTime # time stamps. not useful
 			#self.neighboursTime()
 
-		def x(self): return self.cor[0]
-		def y(self): return self.cor[1]
+			self.neighboursCor = [None, None, None, None] #None if out of boarder
+			self.initNeighboursCor()
+			"""
+			self.NeighboursTime = [None, None, None, None]
+			self.initNeighboursTime()
+			"""
+			self.initActualTT()
 
-		def isMine(self):
-			return self.owner == self.G.uid
 
 
-		def neighbours(self):
-			if self._neighbours == None:
-				up = [self.x, self.y+1] if self.y<G.height-1 else None #Out Of Boarder
-				right = [self.x+1, self.y] if self.x<G.width-1 else None
-				down = [self.x, self.y-1] if self.y>0 else None
-				left = [self.x-1, self.y] if self.x>0 else None
-				self._neighbours = [up, right, down, left]
-			return self._neighbours
-
-	
+		def initNeighboursCor(self):
+			
+			if self.y<G.height-1: self.neighboursCor[0] = (self.x, self.y+1)
+			if self.x<G.width-1: self.neighboursCor[1] = (self.x+1, self.y)
+			if self.y>0: self.neighboursCor[2] = (self.x, self.y-1)
+			if self.x>0: self.neighboursCor[3] = (self.x-1, self.y)
+		
+			"""
 		def neighbourTo(self, position):
 			if position == "up": return self.neighbour().call(n[0])
 			elif position == "right": return self.neighbour().call(n[1])
 			elif position == "down": return self.neighbour().call(n[2])
 			elif position == "left": return self.neighbour().call(n[3])
+			"""
+
+		def initActualTT(self)
 
 		def atFrontline(self):
 			if self.isMine():
@@ -138,7 +143,7 @@ class PetryAI:
 			return p
 
 
-
+			"""
 		def neighboursTime(self):
 			if self._neighboursTime == None:
 				self._neighboursTime = []
@@ -154,7 +159,7 @@ class PetryAI:
 					else:
 						self._neighboursTime.append(call(n_cor).takeTime)
 			return self._neighboursTime
-
+			"""
 
 		def minNeighbourTime(self):
 			min_cor = self.neighbours()[0]
@@ -170,6 +175,9 @@ class PetryAI:
 		def distanceToHq(self):
 			return abs(self.x-hqPosition[0])+abs(self.y-hqPosition[1])
 
+		def refreshSoldier(self):
+			return
+
 		def print(self):
 			print("[ " + str(self.x) + ", " + str(self.y) + " ]")
 			if self.isMine():
@@ -178,30 +186,38 @@ class PetryAI:
 				print("owner: " + str(self.owner) + "  --OTHER'S")
 
 
-	#Soldier OOB(0,0)
 
 
 class PetrySimpleAI:
 
-	def __init__ (self, name, GAME):
-		self.coe_rules=coe_rules
-		self.g=colorfight.Game()
-		self.g.JoinGame(name)
-		
+	def __init__ (self, name, eval_rules, mode="test"): 
+		self.mode = mode # decides which API shall use
+		self.eval_rules = eval_rules
+
+		if self.mode == "test":
+			self.G = localserver.JoinGame(name)
+		else:
+			self.G=colorfight.Game()
+			self.G.JoinGame(name)
+
+
+	
 
 	def eval(self):
-		return 1
+
+		self.initAttr()
+
+		return [0,0]
 
 
 	def actualTT(self, cell_cor, uid):
-		tt = self.g.GetCell(cell_cor[0],cell_cor[1]).
+		tt = self.g.GetCell(cell_cor[0],cell_cor[1])
 		
 
-
-	def getAttributions(self, cell_cor):
+	#initialize attributions
+	def initAttr(self, cell_cor):
 		attributions = {
 			"TT"		: self.takeTime,
 			"isMine"	: False,
 			"celltype"	: "normal",
-
 		}

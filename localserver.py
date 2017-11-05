@@ -102,7 +102,7 @@ class Game:
 					i.attacker = None
 					i.isTaking = False
 	
-	def getNextTimePass(self, auto = True):
+	def getNextTimePass(self):
 
 		min_cd = 99
 		for i in self.PLAYERS:
@@ -113,6 +113,10 @@ class Game:
 			self.TimePass(min_cd)
 
 		return min_cd
+
+	def Refresh(self):
+		self.TimePass(self.getNextTimePass())
+
 
 	def cellNum(self, id):
 		r = 0

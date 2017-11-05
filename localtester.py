@@ -1,4 +1,4 @@
-import petryailib as petry
+import petrysimpleai as petry
 import localserver as server
 
 #GLOBAL SETTINGS
