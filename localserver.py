@@ -66,7 +66,7 @@ class Game:
 		c.attackTime = self.NOW;
 		
 		#actuall takeTime
-		tt = c.takeTime(self.NOW)
+		tt = c.refreshTakeTime()
 		if adj>=1: actualtt = tt - 0.5*(adj-1)
 		c.finishTime = c.attackTime + actualtt
 		c.isTaking = True
@@ -110,11 +110,8 @@ class Game:
 		for i in self.PLAYERS:
 			if i.cd<min_cd: min_cd = i.cd
 		if min_cd == 0: min_cd = 0.1
-		
-		if auto == True:
-			self.TimePass(min_cd)
-
 		return min_cd
+
 
 	def Refresh(self):
 		self.TimePass(self.getNextTimePass())
@@ -152,6 +149,7 @@ class Cell:
 		if self.occupyTime == None: return 2;
 		timeDiff = self.NOW-self.occupyTime
 		self.takeTime = 20*(2**(-timeDiff//20))+2
+		return self.takeTime
 
 
 class Player:

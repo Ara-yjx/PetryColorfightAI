@@ -5,23 +5,32 @@ import operator
 class PetryAI:
 	#global setting
 
-	def __init__ (self, gameInstance, name, eval_rules, mode="test"): 
+	def __init__ (self, gameInstance, name, eval, mode="test"): 
 		self.mode = mode # decides which API shall use
-		self.eval_rules = eval_rules
+		self.eval = eval
 		self.G = gameInstance
-		self.myId = self.G.JoinGame(name)
+		self.base = None
 
+		if mode=="test":
+			self.myId = self.G.JoinGame(name)
+		else: 
+			self.G.JoinGame(name)
+			self.myId = self.G.uid
 		self.Soldiers = []
 
+		#initalize Soldiers
 		for j in range(self.G.height):
 			for i in range(self.G.width):
 				self.Soldiers.append(self.Soldier(self.G.GetCell(i, j)))
 		
-
 		for s in self.Soldiers:
 			s.isMine = (s.owner == self.myId) #initialize Soldier.isMine
 			self.initNeighboursCor(s) #Remain None if out of boarder
 			self.initActualTT(s)
+			if s.isBase and s.isMine: self.base = s.cor #initialize base
+		
+
+
 
 	def initNeighboursCor(self, soldier):
 		if soldier.cor[1]<self.G.height-1: 
@@ -56,7 +65,7 @@ class PetryAI:
 				for i in range(self.G.width):
 					s=self.Soldier(i, j, self.G)
 					self.battleField.append(s)
-					if s.isMine(): 
+					if s.isMine: 
 						hq_pos_sum_x += i
 						hq_pos_sum_y += j
 						mySoldiersNum += 1
@@ -72,7 +81,7 @@ class PetryAI:
 				neighbourIsMine = 0
 				for i in s.neighbours():
 					if i!=None:
-						if call(i).isMine():
+						if call(i).isMine:
 							neighbourIsMine += 1
 				if neighbourIsMine>1 :
 					s.takeTime -= neighbourIsMine*0.5
@@ -87,14 +96,61 @@ class PetryAI:
 	# access to soldier !!! CANNOT HANDLE {None}
 		return self.Soldiers[coordinate[0] + coordinate[1]*self.G.width]
 
+	def outFrontline(self, soldier):
+		if not soldier.isMine: 
+		#if itself is not mine
+			for n_cor in soldier.neighboursCor:
+				if n_cor != None:
+					if self.call(n_cor).isMine: 
+						#and if any of its neighbours is mine
+						return True 
+		return False
 
-	def allSoldiers(self):
-		result = []
-		for j in range(self.G.height):
-			for i in range(self.G.width):
-				result.append(self.call([i,j]))
-		return result
 
+	def refresh(self):
+		#initalize Soldiers
+		self.base = None
+		for s in self.Soldiers:
+			s.refresh(self.G.GetCell(s.cor[0],s.cor[1]))
+			s.isMine = (s.owner == self.myId) #initialize Soldier.isMine
+			self.initActualTT(s)
+			
+			if s.isBase and s.isMine: 
+				self.base = s.cor #initialize base
+
+	def getAttrbutions(self, soldier):
+		return {
+			"takeTime": soldier.takeTime,
+			"cellType": soldier.cellType,
+			"isBase": soldier.isBase,
+			"cor": soldier.cor
+		}
+
+
+	def eval(self, attr):
+		#return 1//attr["takeTime"]
+		r = 1/attr["takeTime"]
+		if attr["cellType"] == "gold": r*=5
+		return r
+
+	def secureBase(self):
+		if self.mode != "test":
+			baseNeiMine = 0
+			for baseNei in self.call(self.base).neighboursCor:
+				if baseNei != None:
+					if self.call(baseNei).isMine: baseNeiMine+=1
+
+			if baseNeiMine <= 1: #find new base
+				for s in self.Soldiers:
+					if s.isMine:
+						newBaseNeiMine = 0 #check if new base is safe
+						for i in s.neighboursCor: 
+							if baseNei != None:
+								if self.call(baseNei).isMine: newBaseNeiMine+=1
+						if newBaseNeiMine==4:
+							self.G.BuildBase(s.cor[0],s.cor[1])
+							return False
+		return True
 
 
 	class Soldier:
@@ -103,16 +159,31 @@ class PetryAI:
 			self.cor=(cell.x, cell.y)
 			self.isMine = False #updated outside
 			self.owner = cell.owner
+			self.cellType = cell.cellType
 			self.isTaking = cell.isTaking
 			self.takeTime = cell.takeTime #updated outside
 			self.attacker = cell.attacker
 			self.finishTime = cell.finishTime
-			
+			self.isBase = cell.isBase
 			#self.occupyTime = c.occupyTime # time stamps. not useful
 			#self.attackTime = c.attackTime # time stamps. not useful
 			#self.neighboursTime()
 
 			self.neighboursCor = [None, None, None, None] #updated outside
+
+
+		def refresh(self, cell):
+			self.owner = cell.owner
+			self.isTaking = cell.isTaking
+			self.takeTime = cell.takeTime #updated outside
+			self.attacker = cell.attacker
+			self.finishTime = cell.finishTime
+			if cell.isBase:
+				self.isBase = True
+				
+			else:
+				self.isBase = False
+
 			"""
 			self.NeighboursTime = [None, None, None, None]
 			self.initNeighboursTime()
@@ -129,30 +200,21 @@ class PetryAI:
 			elif position == "right": return self.neighbour().call(n[1])
 			elif position == "down": return self.neighbour().call(n[2])
 			elif position == "left": return self.neighbour().call(n[3])
-			"""
-
-		
+			
 
 
 
 		def atFrontline(self):
-			if self.isMine():
-				for n_cor in self.neighbours():
+			if self.isMine:
+				for n_cor in self.neighboursCor:
 					if n_cor != None:
-						if not call(n_cor).isMine(): 
+						if not sellf.call(n_cor).isMine: 
 							#if any of its valid neighbour is not mine
 							return True 
 			return False
 
 
-		def outFrontline(self):
-			if not self.isMine(): #if itself is not mine
-				#print("IN OUTFRONTLINE: NOT MINE")
-				for n_cor in self.neighbours():
-					if n_cor != None:
-						if call(n_cor).isMine(): #and if one of its neighbour is mine
-							return True 
-			return False
+			"""
 
 
 		def potential(self): #pre: an outFrontline not being attacked
@@ -181,7 +243,7 @@ class PetryAI:
 					else:
 						self._neighboursTime.append(call(n_cor).takeTime)
 			return self._neighboursTime
-			"""
+			
 
 		def minNeighbourTime(self):
 			min_cor = self.neighbours()[0]
@@ -193,16 +255,16 @@ class PetryAI:
 						min_time = self.neighboursTime()[i]
 						min_cor = self.neighbours()[i]
 			return [min_time, min_cor]
+			
 
 		def distanceToHq(self):
 			return abs(self.x-hqPosition[0])+abs(self.y-hqPosition[1])
+			"""
 
-		def refreshSoldier(self):
-			return 0
 
 		def print(self):
-			print("[ " + str(self.x) + ", " + str(self.y) + " ]")
-			if self.isMine():
+			print(self.cor)
+			if self.isMine:
 				print("owner: " + str(self.owner) + "  --MINE")
 			else:
 				print("owner: " + str(self.owner) + "  --OTHER'S")

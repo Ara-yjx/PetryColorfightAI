@@ -6,9 +6,40 @@ AI = [] #AIs
 AI_NUM = 8
 
 g = server.Game()
+#
+
+AI.append(petry.PetryAI(g, "0P", None, "battle"))
+
+#g.Print()
+
+for s in AI[0].Soldiers:
+	if s.isMine:
+		print("MINE:")
+		s.print()
+		
+print("---")
 
 
-AI.append(petry.PetryAI(g, "0P", None))
+max_evalS = 0
+max_evalS_S = None
+
+for s in AI[0].Soldiers:
+	if AI[0].outFrontline(s):
+		print("FRONTLINE:")
+		s.print()
+		evalS = AI[0].eval(AI[0].getAttrbutions(s))
+		print("EVAL() = "+str(evalS))
+		if evalS>max_evalS:
+			max_evalS_S = s
+			max_evalS = evalS
+
+#g.PlayerAttackCell(AI[0].myId, max_evalS_S.cor[0], max_evalS_S.cor[1])
+g.AttackCell(max_evalS_S.cor[0], max_evalS_S.cor[1])
+g.Refresh()
+#g.Print()
+
+
+
 
 """
 while True:
