@@ -24,10 +24,10 @@ class Cell:
         self.attackTime = cellData['at']
         self.takeTime   = cellData['t']
         self.finishTime = cellData['f']
-        if 'ct' in cellData:
-            self.cellType = cellData['ct']
-        if 'b' in cellData:
-            self.isBase = cellData['b']
+        self.cellType   = cellData['ct']
+        self.isBase     = cellData['b']
+        self.isBuilding = cellData['bt'] != 0
+        self.buildTime  = cellData['bt']
 
     def __repr__(self):
         s = ""
@@ -99,10 +99,10 @@ class Game:
 
         return True
 
-    def AttackCell(self, x, y):
+    def AttackCell(self, x, y, boost = False):
         if self.token != '':
             headers = {'content-type': 'application/json'}
-            r = requests.post(hostUrl + 'attack', data=json.dumps({'cellx':x, 'celly':y, 'token':self.token}), headers = headers)
+            r = requests.post(hostUrl + 'attack', data=json.dumps({'cellx':x, 'celly':y, 'boost': boost, 'token':self.token}), headers = headers)
             if r.status_code == 200:
                 data = r.json()
                 if data['err_code'] == 0:
@@ -128,7 +128,25 @@ class Game:
                 return False, None, "Server did not return correctly, status_code ", r.status_code
         else:
             return False, None, "You need to join the game first!"
-
+    
+    def Boom(self, x, y, direction, boomType):
+        if self.token != '':
+            if direction not in ["square", "vertical", "horizontal"]:
+                return False, None, "Wrong direction!"
+            if boomType not in ["attack", "defense"]:
+                return False, None, "Wrong boom type!"
+            headers = {'content-type': 'application/json'}
+            r = requests.post(hostUrl + 'boom', data=json.dumps({'cellx':x, 'celly':y, 'token':self.token, 'direction':direction, 'boomType':boomType}), headers = headers)
+            if r.status_code == 200:
+                data = r.json()
+                if data['err_code'] == 0:
+                    return True, None, None
+                else:
+                    return False, data['err_code'], data['err_msg']
+            else:
+                return False, None, "Server did not return correctly, status_code ", r.status_code
+        else:
+            return False, None, "You need to join the game first!"
 
     def GetCell(self,x,y):
         if 0 <= x < self.width and 0 <= y < self.height:
